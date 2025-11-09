@@ -11,7 +11,21 @@
 using namespace std;
 
 template <typename T>
-void enter_num(T& num);
+inline void enter_num(T& num)
+{
+	cout << "¬вод: ";
+	while (true) {
+		if (cin >> num) {  // если ввод корректный
+			break;         // выйти из цикла
+		}
+		else {
+			cout << "ќшибка ввода. ¬ведите число заново." << endl;
+			cout << "¬вод: ";
+			cin.clear(); // очистка ошибки
+			cin.ignore(numeric_limits<streamsize>::max(), '\n'); // очистить буфер
+		}
+	}
+}
 
 bool iAmHost();
 bool iAmClient();

@@ -1,20 +1,6 @@
 #include "header.h"
 
-template <typename T>
-void enter_num(T& num)
-{
-	while (true) {
-		if (cin >> num) {  // если ввод корректный
-			break;         // выйти из цикла
-		}
-		else {
-			cout << "Ошибка ввода. Введите число заново." << endl;
-			cout << "Ввод: ";
-			cin.clear(); // очистка ошибки
-			cin.ignore(numeric_limits<streamsize>::max(), '\n'); // очистить буфер
-		}
-	}
-}
+
 
 bool iAmHost()
 {
@@ -73,7 +59,7 @@ bool iAmHost()
 
 	//Получение данных от клиента
 	char buf[1024];
-	while (!_kbhit())
+	while (true)
 	{
 		ZeroMemory(buf, sizeof(buf));
 
@@ -124,11 +110,15 @@ bool iAmClient()
 	std::cout << "Подключение к серверу установлено!\n";
 
 	string massage;
-	while (!_kbhit())
+	while (true)
 	{
 		// 5. Отправка сообщения серверу
 		cout << "Вводите строку для отправки: ";
 		getline(cin, massage);
+		if (massage == "0")
+		{
+			break;
+		}
 		int bytesSent = send(sock, massage.c_str(), strlen(massage.c_str()), 0);
 		if (bytesSent == SOCKET_ERROR) {
 			std::cerr << "Ошибка отправки данных!\n";

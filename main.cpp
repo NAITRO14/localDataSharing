@@ -6,11 +6,12 @@ int main()
 {
 	setlocale(LC_ALL, "ru");
 
-	short choose;
+	short choose = 0;
 
 	while (true)
 	{
 		cout << "Какая роль у машины?" << endl;
+		cout << "1|Хост\n2|Клиент" << endl;
 		enter_num(choose);
 
 		switch (choose)
