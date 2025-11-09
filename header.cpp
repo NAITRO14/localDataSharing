@@ -58,15 +58,25 @@ bool iAmHost()
 	cout << "Клиент подключился !" << endl;
 
 	//Получение данных от клиента
-	char buf[1024];
+	char buf[1024]; char sendbuf[1024] = "Ok!";
 	while (true)
 	{
-		ZeroMemory(buf, sizeof(buf));
+		ZeroMemory(buf, sizeof(buf)); 
 
 		int bytesRecived = recv(clientSocket, buf, sizeof(buf), 0);
 		if (bytesRecived > 0)
 		{
 			cout << "Получено сообщение от клиента: " << string(buf, 0, bytesRecived) << endl;
+		}
+
+		int bytesSent = send(clientSocket, sendbuf, sizeof(sendbuf), 0);
+		if (bytesSent == SOCKET_ERROR)
+		{
+			if (bytesSent == SOCKET_ERROR) {
+				std::cerr << "Ошибка отправки данных!\n";
+				WSACleanup();
+				return 1;
+			}
 		}
 
 	}
@@ -110,6 +120,7 @@ bool iAmClient()
 	std::cout << "Подключение к серверу установлено!\n";
 
 	string massage;
+	char buf[1024];
 	while (true)
 	{
 		// 5. Отправка сообщения серверу
@@ -119,10 +130,18 @@ bool iAmClient()
 		{
 			break;
 		}
+
 		int bytesSent = send(sock, massage.c_str(), strlen(massage.c_str()), 0);
 		if (bytesSent == SOCKET_ERROR) {
 			std::cerr << "Ошибка отправки данных!\n";
 		}
+
+		int bytesRecived = recv(sock, buf, sizeof(buf), 0);
+		if (bytesRecived > 0)
+		{
+			cout << "Получено сообщение от хоста: " << string(buf, 0, bytesRecived) << endl;
+		}
+
 	}
 	
 
