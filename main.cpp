@@ -10,6 +10,8 @@ int main()
 
 	while (true)
 	{
+		choose = 0;
+		system("cls");
 		cout << "Какая роль у машины?" << endl;
 		cout << "1|Хост\n2|Клиент" << endl;
 		enter_num(choose);

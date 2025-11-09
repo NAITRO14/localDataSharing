@@ -136,7 +136,9 @@ bool iAmClient()
 
 		int bytesSent = send(sock, massage.c_str(), strlen(massage.c_str()), 0);
 		if (bytesSent == SOCKET_ERROR) {
-			std::cerr << "Ошибка отправки данных!\n";
+			cout << "Хост разорвал соеденение, сообщение не было доставлено . . ." << endl;
+			system("pause");
+			break;
 		}
 
 		int bytesRecived = recv(sock, buf, sizeof(buf), 0);
@@ -153,7 +155,7 @@ bool iAmClient()
 	// 6. Закрытие сокета и очистка Winsock
 	closesocket(sock);
 	WSACleanup();
-	return 0;
+	return 1;
 }
 
 int ent_port()
