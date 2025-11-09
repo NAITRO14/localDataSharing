@@ -14,6 +14,7 @@ int main()
 		cout << "1|Хост\n2|Клиент" << endl;
 		enter_num(choose);
 
+		system("cls");
 		switch (choose)
 		{
 		case 1:

@@ -26,7 +26,7 @@ bool iAmHost()
 	sockaddr_in serverAddr{};
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.s_addr = INADDR_ANY;
-	serverAddr.sin_port = htons(54000);
+	serverAddr.sin_port = htons(ent_port());
 
 	//привязка сокета к адресу и порту
 	if (bind(listenSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
@@ -73,9 +73,9 @@ bool iAmHost()
 		if (bytesSent == SOCKET_ERROR)
 		{
 			if (bytesSent == SOCKET_ERROR) {
-				std::cerr << "Ошибка отправки данных!\n";
-				WSACleanup();
-				return 1;
+				cerr << "Клиент разовал соеденение . . ." << endl;
+				system("pause");
+				break;
 			}
 		}
 
@@ -106,9 +106,9 @@ bool iAmClient()
 	// 3. Указание IP и порта сервера
 	sockaddr_in serverAddr{};
 	serverAddr.sin_family = AF_INET;
-	// ВАЖНО: здесь задаем IP сервера (например, "192.168.1.5" или "127.0.0.1" для localhost)
-	inet_pton(AF_INET, "10.109.171.66", &serverAddr.sin_addr); // Замените на нужный IP!
-	serverAddr.sin_port = htons(54000); // Порт, на котором слушает сервер
+	
+	inet_pton(AF_INET, "10.109.171.66", &serverAddr.sin_addr); 
+	serverAddr.sin_port = htons(ent_port());
 
 	// 4. Попытка подключения к серверу
 	if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
@@ -121,10 +121,13 @@ bool iAmClient()
 
 	string massage;
 	char buf[1024];
+
+	cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	while (true)
 	{
 		// 5. Отправка сообщения серверу
 		cout << "Вводите строку для отправки: ";
+		
 		getline(cin, massage);
 		if (massage == "0")
 		{
@@ -137,11 +140,13 @@ bool iAmClient()
 		}
 
 		int bytesRecived = recv(sock, buf, sizeof(buf), 0);
-		if (bytesRecived > 0)
+		if (bytesRecived == 0)
 		{
-			cout << "Получено сообщение от хоста: " << string(buf, 0, bytesRecived) << endl;
+			cout << "Хост разорвал соеденение . . ." << endl;
+			system("pause");
+			break;
 		}
-
+		
 	}
 	
 
@@ -149,4 +154,13 @@ bool iAmClient()
 	closesocket(sock);
 	WSACleanup();
 	return 0;
+}
+
+int ent_port()
+{
+	int port = 0;
+	cout << "Введите порт сервера: " << endl;
+	enter_num(port);
+	system("cls");
+	return port;
 }

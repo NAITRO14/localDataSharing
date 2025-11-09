@@ -30,3 +30,5 @@ inline void enter_num(T& num)
 bool iAmHost();
 bool iAmClient();
 
+int ent_port();
+
