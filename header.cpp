@@ -86,7 +86,7 @@ bool iAmHost(int port)
 	return 0;
 }
 
-bool iAmClient()
+bool iAmClient(int port)
 {
 	// 1. Инициализация Winsock
 	WSADATA wsaData;
@@ -120,7 +120,9 @@ bool iAmClient()
 	}
 	cout << "Подключение к серверу установлено!" << endl;
 
-	return 1;
+	Fl::awake(server_connected, nullptr);
+
+	return 0;
 }
 
 void hstBtPrsd(Fl_Widget* w, void* data)
@@ -149,7 +151,8 @@ void open_serverBtn(Fl_Widget* w, void* data)
 
 void client_connected(void* data)
 {
-	menu.hostGr->child(1)->show();
+	menu.clientGr->child(1)->hide();
+	menu.MainApp->show();
 }
 
 int enter_port(Fl_Widget* w, void* data)
@@ -159,3 +162,58 @@ int enter_port(Fl_Widget* w, void* data)
 
 	return port;
 }
+
+void clntBtPsd(Fl_Widget* w, void* data)
+{
+	menu.roleGr->hide();
+	menu.clientGr->show();
+
+	Data.inp->show();
+}
+
+void connect_to_server(Fl_Widget* w, void* data)
+{
+	int port = enter_port(w, data);
+
+	Data.inp->hide();
+	w->hide();
+	w->parent()->child(1)->show();
+
+
+	thread clientThread([port]()
+		{
+			bool res = iAmClient(port);
+			if (res == 1)
+			{
+				Fl::awake(server_connection_failed, nullptr);
+			}
+		});
+	clientThread.detach();
+
+}
+
+void server_connected(void* data)
+{
+	menu.clientGr->child(1)->hide();
+	menu.MainApp->show();
+
+	thread isServerHere([]()
+		{
+			bool res = isServerHereChek();
+		});
+	isServerHere.detach();
+}
+
+void server_connection_failed(void* data)
+{
+	menu.clientGr->child(1)->hide();
+	menu.errorScreen->show();
+}
+
+bool isServerHereChek()
+{
+
+	return 1;
+}
+
+

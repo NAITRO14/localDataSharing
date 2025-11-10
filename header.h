@@ -28,6 +28,8 @@ struct menues
 	Fl_Group* roleGr;
 	Fl_Group* hostGr;
 	Fl_Group* clientGr;
+	Fl_Group* MainApp;
+	Fl_Group* errorScreen;
 };
 extern menues menu;
 
@@ -36,8 +38,11 @@ struct AppData
 	int* port;
 	string* ipAddr;
 	Fl_Input* inp;
+	SOCKET* to_serv_soket;
+	SOCKET* to_client_soket;
 };
 extern AppData Data;
+
 
 template <typename T>
 inline void enter_num(T& num)
@@ -57,7 +62,7 @@ inline void enter_num(T& num)
 }
 
 bool iAmHost(int port);
-bool iAmClient();
+bool iAmClient(int port);
 
 //---------------
 void hstBtPrsd(Fl_Widget* w, void* data);
@@ -67,3 +72,10 @@ void client_connected(void* data);
 
 int enter_port(Fl_Widget* w, void* data);
 
+//---------------
+void clntBtPsd(Fl_Widget* w, void* data);
+void connect_to_server(Fl_Widget* w, void* data);
+void server_connected(void* data);
+void server_connection_failed(void* data);
+
+bool isServerHereChek();
