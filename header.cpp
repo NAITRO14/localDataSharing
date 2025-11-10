@@ -1,64 +1,64 @@
-#include "header.h"
+п»ї#include "header.h"
 
-
-
-bool iAmHost()
+bool iAmHost(int port)
 {
-	//инициализация
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 	WSADATA wsaData;
 	int wsOk = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (wsOk != 0)
 	{
-		cerr << "Ошибка иницилизации! Код: " << wsOk << endl;
+		cerr << "РћС€РёР±РєР° РёРЅРёС†РёР»РёР·Р°С†РёРё! РљРѕРґ: " << wsOk << endl;
 		return 1;
 	}
 
 	SOCKET listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listenSocket == INVALID_SOCKET)
 	{
-		cerr << "Ошибка создания сокета!" << endl;
+		cerr << "РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ СЃРѕРєРµС‚Р°!" << endl;
 		WSACleanup();
 		return 1;
 	}
 
 
-	//настройка адреса
+	//РЅР°СЃС‚СЂРѕР№РєР° Р°РґСЂРµСЃР°
 	sockaddr_in serverAddr{};
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.s_addr = INADDR_ANY;
-	serverAddr.sin_port = htons(ent_port());
+	serverAddr.sin_port = htons(port); // !
 
-	//привязка сокета к адресу и порту
+	//РїСЂРёРІСЏР·РєР° СЃРѕРєРµС‚Р° Рє Р°РґСЂРµСЃСѓ Рё РїРѕСЂС‚Сѓ
 	if (bind(listenSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{
-		cerr << "Ошибка привязки сокета!" << endl;
+		cerr << "РћС€РёР±РєР° РїСЂРёРІСЏР·РєРё СЃРѕРєРµС‚Р°!" << endl;
 		closesocket(listenSocket);
 		WSACleanup();
 		return 1;
 	}
 
-	//переход сокета в режим прослушивания
+	//РїРµСЂРµС…РѕРґ СЃРѕРєРµС‚Р° РІ СЂРµР¶РёРј РїСЂРѕСЃР»СѓС€РёРІР°РЅРёСЏ
 	if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR)
 	{
-		cerr << "Ошибка запуска прослушивания!" << endl;
+		cerr << "РћС€РёР±РєР° Р·Р°РїСѓСЃРєР° РїСЂРѕСЃР»СѓС€РёРІР°РЅРёСЏ!" << endl;
 		closesocket(listenSocket);
 		WSACleanup();
 		return 1;
 	}
 
-	//ожидание подключение клиента
-	cout << "Ожидание подключения клиента . . ." << endl;
+	//РѕР¶РёРґР°РЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ РєР»РёРµРЅС‚Р°
+	cout << "РћР¶РёРґР°РЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РєР»РёРµРЅС‚Р° . . ." << endl;
 	SOCKET clientSocket = accept(listenSocket, nullptr, nullptr);
 	if (clientSocket == INVALID_SOCKET)
 	{
-		cerr << "Ошибка при принятии подключения!" << endl;
+		cerr << "РћС€РёР±РєР° РїСЂРё РїСЂРёРЅСЏС‚РёРё РїРѕРґРєР»СЋС‡РµРЅРёСЏ!" << endl;
 		WSACleanup();
 		return 1;
 	}
-	cout << "Клиент подключился !" << endl;
+	cout << "РљР»РёРµРЅС‚ РїРѕРґРєР»СЋС‡РёР»СЃСЏ !" << endl;
 
-	//Получение данных от клиента
-	char buf[1024]; char sendbuf[1024] = "Ok!";
+	Fl::awake(client_connected, nullptr);
+
+	//РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РѕС‚ РєР»РёРµРЅС‚Р°
+	/*char buf[1024]; char sendbuf[1024] = "Ok!";
 	while (true)
 	{
 		ZeroMemory(buf, sizeof(buf)); 
@@ -66,103 +66,96 @@ bool iAmHost()
 		int bytesRecived = recv(clientSocket, buf, sizeof(buf), 0);
 		if (bytesRecived > 0)
 		{
-			cout << "Получено сообщение от клиента: " << string(buf, 0, bytesRecived) << endl;
+			cout << "РџРѕР»СѓС‡РµРЅРѕ СЃРѕРѕР±С‰РµРЅРёРµ РѕС‚ РєР»РёРµРЅС‚Р°: " << string(buf, 0, bytesRecived) << endl;
 		}
 
 		int bytesSent = send(clientSocket, sendbuf, sizeof(sendbuf), 0);
 		if (bytesSent == SOCKET_ERROR)
 		{
 			if (bytesSent == SOCKET_ERROR) {
-				cerr << "Клиент разовал соеденение . . ." << endl;
+				cerr << "РљР»РёРµРЅС‚ СЂР°Р·РѕРІР°Р» СЃРѕРµРґРµРЅРµРЅРёРµ . . ." << endl;
 				system("pause");
 				break;
 			}
 		}
 
-	}
-	closesocket(clientSocket);
+	}*/
+	/*closesocket(clientSocket);
 	closesocket(listenSocket);
-	WSACleanup();
+	WSACleanup();*/
+	return 0;
 }
 
 bool iAmClient()
 {
-	// 1. Инициализация Winsock
+	// 1. РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Winsock
 	WSADATA wsaData;
 	int wsOk = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (wsOk != 0) {
-		std::cerr << "Ошибка инициализации Winsock! Код: " << wsOk << "\n";
+		cerr << "РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё Winsock! РљРѕРґ: " << wsOk << "\n";
 		return 1;
 	}
 
-	// 2. Создание TCP сокета
+	// 2. РЎРѕР·РґР°РЅРёРµ TCP СЃРѕРєРµС‚Р°
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sock == INVALID_SOCKET) {
-		std::cerr << "Ошибка создания сокета!\n";
+		cerr << "РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ СЃРѕРєРµС‚Р°!\n";
 		WSACleanup();
 		return 1;
 	}
 
-	// 3. Указание IP и порта сервера
+	// 3. РЈРєР°Р·Р°РЅРёРµ IP Рё РїРѕСЂС‚Р° СЃРµСЂРІРµСЂР°
 	sockaddr_in serverAddr{};
 	serverAddr.sin_family = AF_INET;
 	
 	inet_pton(AF_INET, "10.109.171.66", &serverAddr.sin_addr); 
-	serverAddr.sin_port = htons(ent_port());
+	serverAddr.sin_port = htons(1);
 
-	// 4. Попытка подключения к серверу
+	// 4. РџРѕРїС‹С‚РєР° РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє СЃРµСЂРІРµСЂСѓ
 	if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-		std::cerr << "Ошибка подключения к серверу!\n";
+		cerr << "РћС€РёР±РєР° РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє СЃРµСЂРІРµСЂСѓ!" << endl;
 		closesocket(sock);
 		WSACleanup();
 		return 1;
 	}
-	std::cout << "Подключение к серверу установлено!\n";
+	cout << "РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СЃРµСЂРІРµСЂСѓ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ!" << endl;
 
-	string massage;
-	char buf[1024];
-
-	cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	while (true)
-	{
-		// 5. Отправка сообщения серверу
-		cout << "Вводите строку для отправки: ";
-		
-		getline(cin, massage);
-		if (massage == "0")
-		{
-			break;
-		}
-
-		int bytesSent = send(sock, massage.c_str(), strlen(massage.c_str()), 0);
-		if (bytesSent == SOCKET_ERROR) {
-			cout << "Хост разорвал соеденение, сообщение не было доставлено . . ." << endl;
-			system("pause");
-			break;
-		}
-
-		int bytesRecived = recv(sock, buf, sizeof(buf), 0);
-		if (bytesRecived == 0)
-		{
-			cout << "Хост разорвал соеденение . . ." << endl;
-			system("pause");
-			break;
-		}
-		
-	}
-	
-
-	// 6. Закрытие сокета и очистка Winsock
-	closesocket(sock);
-	WSACleanup();
 	return 1;
 }
 
-int ent_port()
+void hstBtPrsd(Fl_Widget* w, void* data)
 {
-	int port = 0;
-	cout << "Введите порт сервера: " << endl;
-	enter_num(port);
-	system("cls");
+	menu.roleGr->hide();
+	menu.hostGr->show();
+
+	Data.inp->show();
+}
+
+void open_serverBtn(Fl_Widget* w, void* data)
+{
+	int port = enter_port(w, data);
+
+	Data.inp->hide();
+	w->hide();
+	w->parent()->child(1)->show();
+
+
+	thread hostThread([port]()
+		{
+			bool res = iAmHost(port);
+		});
+	hostThread.detach();
+}
+
+void client_connected(void* data)
+{
+	menu.hostGr->child(1)->show();
+}
+
+int enter_port(Fl_Widget* w, void* data)
+{
+	Fl_Input* inp = (Fl_Input*)data;
+	int port = int(inp->value());
+
 	return port;
 }
