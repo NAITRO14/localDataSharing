@@ -78,4 +78,7 @@ void connect_to_server(Fl_Widget* w, void* data);
 void server_connected(void* data);
 void server_connection_failed(void* data);
 
-bool isServerHereChek();
+bool isServerHereCheck();
+bool isClintHereChek();
+
+void disconnected(void* data);

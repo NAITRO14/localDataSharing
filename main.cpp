@@ -98,6 +98,7 @@ int main(int argc, char** argv)
 		errorScreen->hide();
 		errorScreen->end();
 
+
 	
 	win->end();
 	win->show(argc, argv);

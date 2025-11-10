@@ -24,7 +24,7 @@ bool iAmHost(int port)
 	sockaddr_in serverAddr{};
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.s_addr = INADDR_ANY;
-	serverAddr.sin_port = htons(port); // !
+	serverAddr.sin_port = htons(port);
 
 	//привязка сокета к адресу и порту
 	if (bind(listenSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
@@ -44,6 +44,7 @@ bool iAmHost(int port)
 		return 1;
 	}
 
+	cout << "Сервер работает на порту: " << port << endl;
 	//ожидание подключение клиента
 	cout << "Ожидание подключения клиента . . ." << endl;
 	SOCKET clientSocket = accept(listenSocket, nullptr, nullptr);
@@ -103,6 +104,7 @@ bool iAmClient(int port)
 		WSACleanup();
 		return 1;
 	}
+	Data.to_serv_soket = &sock;
 
 	// 3. Указание IP и порта сервера
 	sockaddr_in serverAddr{};
@@ -151,14 +153,20 @@ void open_serverBtn(Fl_Widget* w, void* data)
 
 void client_connected(void* data)
 {
-	menu.clientGr->child(1)->hide();
+	menu.hostGr->child(1)->hide();
 	menu.MainApp->show();
+
+	thread isClientHere([]()
+		{
+			bool res = isClintHereChek();
+		});
+	isClientHere.detach();
 }
 
 int enter_port(Fl_Widget* w, void* data)
 {
 	Fl_Input* inp = (Fl_Input*)data;
-	int port = int(inp->value());
+	int port = stoi(inp->value());
 
 	return port;
 }
@@ -199,7 +207,11 @@ void server_connected(void* data)
 
 	thread isServerHere([]()
 		{
-			bool res = isServerHereChek();
+			bool res = isServerHereCheck();
+			if (res == 0)
+			{
+				Fl::awake(disconnected, nullptr);
+			}
 		});
 	isServerHere.detach();
 }
@@ -210,10 +222,44 @@ void server_connection_failed(void* data)
 	menu.errorScreen->show();
 }
 
-bool isServerHereChek()
+bool isServerHereCheck() 
 {
-
+	while (true)
+	{
+		const char* message = "Hello, server!";
+		int messageLen = strlen(message);
+		int bytesSent = send(*Data.to_serv_soket, message, messageLen, 0);
+		if (bytesSent == INVALID_SOCKET)
+		{
+			return 0;
+		}
+		this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
 	return 1;
+}
+
+bool isClintHereChek()
+{
+	while(true)
+	{
+		char buf[1024];
+		ZeroMemory(buf, sizeof(buf));
+
+		int bytesRecv = recv(*Data.to_serv_soket, buf, sizeof(buf), 0);
+		if (bytesRecv == SOCKET_ERROR || bytesRecv == 0)
+		{
+			return 0; // ошибка или соединение закрыто
+		}
+		this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	
+	return 1;
+}
+
+void disconnected(void* data)
+{
+	menu.MainApp->hide();
+	menu.errorScreen->show();
 }
 
 
