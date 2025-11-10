@@ -18,7 +18,7 @@ bool iAmHost(int port)
 		WSACleanup();
 		return 1;
 	}
-	Data.to_client_soket = &listenSocket;
+	
 
 	//настройка адреса
 	sockaddr_in serverAddr{};
@@ -57,6 +57,8 @@ bool iAmHost(int port)
 	cout << "Клиент подключился !" << endl;
 
 	Fl::awake(client_connected, nullptr);
+
+	Data.to_client_soket = clientSocket;
 
 	//Получение данных от клиента
 	/*char buf[1024]; char sendbuf[1024] = "Ok!";
@@ -104,7 +106,7 @@ bool iAmClient(int port)
 		WSACleanup();
 		return 1;
 	}
-	Data.to_serv_soket = &sock;
+	Data.to_serv_soket = sock;
 
 	// 3. Указание IP и порта сервера
 	sockaddr_in serverAddr{};
@@ -159,6 +161,10 @@ void client_connected(void* data)
 	thread isClientHere([]()
 		{
 			bool res = isClintHereChek();
+			if (res == 0)
+			{
+				Fl::awake(disconnected, nullptr);
+			}
 		});
 	isClientHere.detach();
 }
@@ -228,7 +234,7 @@ bool isServerHereCheck()
 	{
 		const char* message = "Hello, server!";
 		int messageLen = strlen(message);
-		int bytesSent = send(*Data.to_serv_soket, message, messageLen, 0);
+		int bytesSent = send(Data.to_serv_soket, message, messageLen, 0);
 		if (bytesSent == SOCKET_ERROR)
 		{
 			return 0;
@@ -245,7 +251,9 @@ bool isClintHereChek()
 		char buf[1024];
 		ZeroMemory(buf, sizeof(buf));
 
-		int bytesRecv = recv(*Data.to_client_soket, buf, sizeof(buf), 0);
+		int bytesRecv = recv(Data.to_client_soket, buf, sizeof(buf), 0);
+		int err = WSAGetLastError();
+		std::cerr << "Ошибка recv: " << err << std::endl;
 		if (bytesRecv == SOCKET_ERROR || bytesRecv == 0)
 		{
 			return 0; // ошибка или соединение закрыто

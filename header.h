@@ -38,8 +38,8 @@ struct AppData
 	int* port;
 	string* ipAddr;
 	Fl_Input* inp;
-	SOCKET* to_serv_soket;
-	SOCKET* to_client_soket;
+	SOCKET to_serv_soket;
+	SOCKET to_client_soket;
 };
 extern AppData Data;
 
