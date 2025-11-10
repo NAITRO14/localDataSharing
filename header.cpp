@@ -18,7 +18,7 @@ bool iAmHost(int port)
 		WSACleanup();
 		return 1;
 	}
-
+	Data.to_client_soket = &listenSocket;
 
 	//настройка адреса
 	sockaddr_in serverAddr{};
@@ -111,7 +111,7 @@ bool iAmClient(int port)
 	serverAddr.sin_family = AF_INET;
 	
 	inet_pton(AF_INET, "10.109.171.66", &serverAddr.sin_addr); 
-	serverAddr.sin_port = htons(1);
+	serverAddr.sin_port = htons(port);
 
 	// 4. Попытка подключения к серверу
 	if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
@@ -229,7 +229,7 @@ bool isServerHereCheck()
 		const char* message = "Hello, server!";
 		int messageLen = strlen(message);
 		int bytesSent = send(*Data.to_serv_soket, message, messageLen, 0);
-		if (bytesSent == INVALID_SOCKET)
+		if (bytesSent == SOCKET_ERROR)
 		{
 			return 0;
 		}
@@ -245,7 +245,7 @@ bool isClintHereChek()
 		char buf[1024];
 		ZeroMemory(buf, sizeof(buf));
 
-		int bytesRecv = recv(*Data.to_serv_soket, buf, sizeof(buf), 0);
+		int bytesRecv = recv(*Data.to_client_soket, buf, sizeof(buf), 0);
 		if (bytesRecv == SOCKET_ERROR || bytesRecv == 0)
 		{
 			return 0; // ошибка или соединение закрыто
