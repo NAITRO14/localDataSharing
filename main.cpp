@@ -2,42 +2,16 @@
 
 
 
-int main()
+int main(int argc, char** argv)
 {
 	setlocale(LC_ALL, "ru");
 
-	short choose = 0;
+	Fl_Double_Window* win = new Fl_Double_Window(800, 600, "Main window");
 
-	while (true)
-	{
-		choose = 0;
-		system("cls");
-		cout << "Какая роль у машины?" << endl;
-		cout << "1|Хост\n2|Клиент" << endl;
-		enter_num(choose);
-
-		system("cls");
-		switch (choose)
-		{
-		case 1:
-		{
-			if (!iAmHost())
-			{
-				return iAmHost();
-			}
-
-		}break;
-		case 2:
-		{
-			if (!iAmClient())
-			{
-				return iAmClient();
-			}
-		}break;
-		}
-	}
 	
-
+	
+	win->end();
+	win->show(argc, argv);
 	
 	return 0;
 }

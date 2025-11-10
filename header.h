@@ -6,6 +6,13 @@
 #include <WS2tcpip.h>
 #include <conio.h>
 #include <string>
+
+//графика
+#include <FL/Fl.H>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Group.H>
+
 #pragma comment(lib, "ws2_32.lib")
 
 using namespace std;
